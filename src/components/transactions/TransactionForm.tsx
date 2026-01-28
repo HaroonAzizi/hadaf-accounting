@@ -7,6 +7,7 @@ import { Calendar, DollarSign, FileText, User } from "lucide-react";
 import type {
   Category,
   Transaction,
+  TransactionStatus,
   TransactionType,
 } from "../../services/api";
 import { CURRENCIES } from "../../utils/constants";
@@ -17,6 +18,7 @@ import { Select } from "../common/Select";
 
 const schema = z.object({
   type: z.enum(["in", "out"]),
+  status: z.enum(["pending", "done", "cancelled"]),
   category_id: z.coerce
     .number()
     .int()
@@ -44,6 +46,7 @@ export function TransactionForm({
 
   const defaultValues: TransactionFormInput = {
     type: (initialData?.type ?? "in") as TransactionType,
+    status: (initialData?.status ?? "done") as TransactionStatus,
     category_id: initialData?.category_id ?? "",
     amount: initialData?.amount ?? "",
     currency: initialData?.currency ?? "AFN",
@@ -102,6 +105,16 @@ export function TransactionForm({
             <p className="text-sm text-red-500 mt-1">{errors.type.message}</p>
           ) : null}
         </div>
+
+        <Select
+          label="Status"
+          error={errors.status?.message}
+          {...register("status")}
+        >
+          <option value="done">Done</option>
+          <option value="pending">Pending</option>
+          <option value="cancelled">Cancelled</option>
+        </Select>
 
         <Select
           label="Category"

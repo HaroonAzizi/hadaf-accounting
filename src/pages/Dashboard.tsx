@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { Layout } from "../components/layout/Layout";
 import { SummaryCard } from "../components/dashboard/SummaryCard";
@@ -8,6 +8,7 @@ import {
 } from "../components/dashboard/MonthlyChart";
 import { CategoryBreakdown } from "../components/dashboard/CategoryBreakdown";
 import { RecentTransactions } from "../components/dashboard/RecentTransactions";
+import { FollowUps } from "../components/dashboard/FollowUps";
 import { Loading } from "../components/common/Loading";
 
 import { useAppContext } from "../context/AppContext";
@@ -16,11 +17,44 @@ import { useTransactions } from "../hooks/useTransactions";
 
 export default function DashboardPage() {
   const { dateRange } = useAppContext();
-  const { summary, loading: summaryLoading } = useDashboard(dateRange);
-  const { transactions, loading: txLoading } = useTransactions({
+  const {
+    summary,
+    followUps,
+    loading: dashboardLoading,
+    refetch: refetchDashboard,
+  } = useDashboard(dateRange);
+  const {
+    transactions,
+    loading: txLoading,
+    updateTransaction,
+  } = useTransactions({
     startDate: dateRange.startDate ?? undefined,
     endDate: dateRange.endDate ?? undefined,
   });
+
+  const [busyFollowUps, setBusyFollowUps] = useState<Set<number>>(new Set());
+
+  const markBusy = useCallback((id: number, busy: boolean) => {
+    setBusyFollowUps((prev) => {
+      const next = new Set(prev);
+      if (busy) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+  }, []);
+
+  const handleFollowUpStatus = useCallback(
+    async (id: number, status: "done" | "cancelled") => {
+      markBusy(id, true);
+      try {
+        await updateTransaction(id, { status });
+        await refetchDashboard();
+      } finally {
+        markBusy(id, false);
+      }
+    },
+    [markBusy, refetchDashboard, updateTransaction],
+  );
 
   const recentTransactions = useMemo(() => {
     const sorted = [...transactions].sort((a, b) =>
@@ -28,6 +62,11 @@ export default function DashboardPage() {
     );
     return sorted.slice(0, 6);
   }, [transactions]);
+
+  const followUpsSorted = useMemo(() => {
+    const pending = (followUps || []).filter((t) => t.status === "pending");
+    return [...pending].sort((a, b) => a.date.localeCompare(b.date));
+  }, [followUps]);
 
   const monthlyChartData = useMemo<MonthlyChartRow[]>(() => {
     const rows = summary?.monthlyBreakdown ?? [];
@@ -53,7 +92,7 @@ export default function DashboardPage() {
           </div>
         </header>
 
-        {summaryLoading || !summary ? (
+        {dashboardLoading || !summary ? (
           <Loading label="Loading dashboard..." />
         ) : (
           <>
@@ -80,6 +119,15 @@ export default function DashboardPage() {
               <CategoryBreakdown
                 data={summary.profitByCategory}
                 currency="AFN"
+              />
+            </section>
+
+            <section>
+              <FollowUps
+                items={followUpsSorted}
+                busyIds={busyFollowUps}
+                onMarkDone={(id) => void handleFollowUpStatus(id, "done")}
+                onCancel={(id) => void handleFollowUpStatus(id, "cancelled")}
               />
             </section>
           </>

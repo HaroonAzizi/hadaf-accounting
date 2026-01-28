@@ -14,6 +14,19 @@ export function TransactionRow({
   onDelete: (id: number) => void;
 }) {
   const isIncome = transaction.type === "in";
+  const showStatusBadge = transaction.status !== "done";
+  const statusBadge =
+    transaction.status === "pending"
+      ? "bg-amber-100 text-amber-700"
+      : transaction.status === "cancelled"
+        ? "bg-slate-100 text-slate-700"
+        : "bg-emerald-100 text-emerald-700";
+  const statusLabel =
+    transaction.status === "pending"
+      ? "Pending"
+      : transaction.status === "cancelled"
+        ? "Cancelled"
+        : "Done";
 
   return (
     <div className="group p-4 rounded-xl border-2 border-slate-100 hover:border-sky-500/20 hover:shadow-md transition-all">
@@ -32,9 +45,18 @@ export function TransactionRow({
           </div>
 
           <div className="min-w-0">
-            <h4 className="font-semibold text-lg truncate">
-              {transaction.name}
-            </h4>
+            <div className="flex items-center gap-2 min-w-0">
+              <h4 className="font-semibold text-lg truncate">
+                {transaction.name}
+              </h4>
+              {showStatusBadge ? (
+                <span
+                  className={`text-xs px-2 py-1 rounded-full shrink-0 ${statusBadge}`}
+                >
+                  {statusLabel}
+                </span>
+              ) : null}
+            </div>
             <p className="text-sm text-slate-500 truncate">
               {(transaction.category_name || "Uncategorized") +
                 " • " +

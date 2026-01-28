@@ -22,11 +22,18 @@ export function getTransactions(
       ? String(req.query.startDate)
       : undefined;
     const endDate = req.query.endDate ? String(req.query.endDate) : undefined;
+    const status = req.query.status ? String(req.query.status) : undefined;
 
     const rows = transactionModel.getAllTransactions({
       categoryId:
         categoryId && !Number.isNaN(categoryId) ? categoryId : undefined,
       type: type === "in" || type === "out" ? type : undefined,
+      status:
+        status === "pending" || status === "done" || status === "cancelled"
+          ? status
+          : status === "all"
+            ? "all"
+            : undefined,
       currency,
       startDate,
       endDate,
@@ -69,6 +76,7 @@ export function createTransaction(
       amount: number;
       currency: string;
       type: "in" | "out";
+      status?: "pending" | "done" | "cancelled";
       date: string;
       name: string;
       description?: string | null;
@@ -81,6 +89,7 @@ export function createTransaction(
       amount: body.amount,
       currency: body.currency,
       type: body.type,
+      status: body.status,
       date,
       name: body.name,
       description: body.description ?? null,
@@ -116,6 +125,7 @@ export function updateTransaction(
       amount?: number;
       currency?: string;
       type?: "in" | "out";
+      status?: "pending" | "done" | "cancelled";
       date?: string;
       name?: string;
       description?: string | null;
@@ -126,6 +136,7 @@ export function updateTransaction(
       amount: body.amount,
       currency: body.currency,
       type: body.type,
+      status: body.status,
       date: body.date ? String(body.date).split("T")[0] : undefined,
       name: body.name,
       description: body.description,

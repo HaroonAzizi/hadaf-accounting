@@ -22,6 +22,7 @@ export const validateTransactionCreate = [
     .isString()
     .isIn([...allowedCurrencies]),
   body("type").isString().isIn(["in", "out"]),
+  body("status").optional().isString().isIn(["pending", "done", "cancelled"]),
   body("date").isISO8601({ strict: true }),
   body("name").isString().trim().notEmpty(),
   body("description").optional({ nullable: true }).isString(),
@@ -35,6 +36,7 @@ export const validateTransactionUpdate = [
     .isString()
     .isIn([...allowedCurrencies]),
   body("type").optional().isString().isIn(["in", "out"]),
+  body("status").optional().isString().isIn(["pending", "done", "cancelled"]),
   body("date").optional().isISO8601({ strict: true }),
   body("name").optional().isString().trim().notEmpty(),
   body("description").optional({ nullable: true }).isString(),

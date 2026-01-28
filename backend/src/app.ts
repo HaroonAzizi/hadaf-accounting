@@ -35,6 +35,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
+app.get("/", (req, res) => {
+  return sendSuccess(res, {
+    data: {
+      health: "/api/health",
+      categories: "/api/categories",
+      transactions: "/api/transactions",
+      dashboard: "/api/dashboard/summary",
+    },
+    message: "Hadaf API",
+  });
+});
+
 app.get("/api/health", (req, res) => {
   return sendSuccess(res, { data: { status: "ok" }, message: "OK" });
 });

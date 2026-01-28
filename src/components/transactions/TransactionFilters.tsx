@@ -1,7 +1,11 @@
 import { useMemo, type Dispatch, type SetStateAction } from "react";
 import { Filter } from "lucide-react";
 
-import type { Category, TransactionType } from "../../services/api";
+import type {
+  Category,
+  TransactionStatus,
+  TransactionType,
+} from "../../services/api";
 import { CURRENCIES } from "../../utils/constants";
 import { flattenCategories } from "../../utils/flattenCategories";
 import { Button } from "../common/Button";
@@ -11,6 +15,7 @@ import { Select } from "../common/Select";
 export type TransactionFiltersState = {
   categoryId?: number;
   type?: TransactionType;
+  status?: TransactionStatus | "all";
   startDate?: string;
   endDate?: string;
   currency?: string;

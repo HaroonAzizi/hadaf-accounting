@@ -47,6 +47,8 @@ export type Category = {
 
 export type TransactionType = "in" | "out";
 
+export type TransactionStatus = "pending" | "done" | "cancelled";
+
 export type Transaction = {
   id: number;
   category_id: number;
@@ -54,12 +56,24 @@ export type Transaction = {
   amount: number;
   currency: string;
   type: TransactionType;
+  status: TransactionStatus;
   date: string; // YYYY-MM-DD
   name: string;
   description?: string | null;
   created_at?: string;
   updated_at?: string;
 };
+
+export type TransactionCreateInput = Omit<
+  Transaction,
+  "id" | "category_name" | "created_at" | "updated_at"
+> & {
+  status?: TransactionStatus;
+};
+
+export type TransactionUpdateInput = Partial<
+  Omit<Transaction, "id" | "category_name" | "created_at" | "updated_at">
+>;
 
 export type Frequency = "daily" | "weekly" | "monthly" | "yearly";
 
@@ -116,6 +130,7 @@ export const transactionsAPI = {
   getAll: (params?: {
     categoryId?: number;
     type?: TransactionType;
+    status?: TransactionStatus | "all";
     startDate?: string;
     endDate?: string;
     currency?: string;
@@ -128,22 +143,12 @@ export const transactionsAPI = {
     api.get<ApiSuccess<Transaction>, ApiSuccess<Transaction>>(
       `/transactions/${id}`,
     ),
-  create: (
-    data: Omit<
-      Transaction,
-      "id" | "category_name" | "created_at" | "updated_at"
-    >,
-  ) =>
+  create: (data: TransactionCreateInput) =>
     api.post<ApiSuccess<Transaction>, ApiSuccess<Transaction>>(
       "/transactions",
       data,
     ),
-  update: (
-    id: number,
-    data: Partial<
-      Omit<Transaction, "id" | "category_name" | "created_at" | "updated_at">
-    >,
-  ) =>
+  update: (id: number, data: TransactionUpdateInput) =>
     api.put<ApiSuccess<Transaction>, ApiSuccess<Transaction>>(
       `/transactions/${id}`,
       data,
@@ -156,6 +161,11 @@ export const dashboardAPI = {
   getSummary: (params?: { startDate?: string; endDate?: string }) =>
     api.get<ApiSuccess<DashboardSummary>, ApiSuccess<DashboardSummary>>(
       "/dashboard/summary",
+      { params },
+    ),
+  getFollowUps: (params?: { startDate?: string; endDate?: string }) =>
+    api.get<ApiSuccess<Transaction[]>, ApiSuccess<Transaction[]>>(
+      "/dashboard/followups",
       { params },
     ),
 };

@@ -87,6 +87,21 @@ export function createRecurring(
       is_active: body.is_active,
     });
 
+    // Ensure there is a pending payment instance for the next due date.
+    if (row) {
+      transactionModel.createTransaction({
+        category_id: row.category_id,
+        recurring_id: row.id,
+        amount: row.amount,
+        currency: row.currency,
+        type: row.type,
+        status: "pending",
+        date: row.next_due_date,
+        name: row.name,
+        description: row.description,
+      });
+    }
+
     logger.info("Recurring created", {
       id: row?.id,
       category_id: row?.category_id,

@@ -21,6 +21,19 @@ export function RecentTransactions({
       <div className="space-y-3">
         {transactions.map((t) => {
           const isIncome = t.type === "in";
+          const showStatusBadge = t.status !== "done";
+          const statusBadge =
+            t.status === "pending"
+              ? "bg-amber-100 text-amber-700"
+              : t.status === "cancelled"
+                ? "bg-slate-100 text-slate-700"
+                : "bg-emerald-100 text-emerald-700";
+          const statusLabel =
+            t.status === "pending"
+              ? "Pending"
+              : t.status === "cancelled"
+                ? "Cancelled"
+                : "Done";
           return (
             <div
               key={t.id}
@@ -41,9 +54,18 @@ export function RecentTransactions({
                   </div>
 
                   <div className="min-w-0">
-                    <h4 className="font-semibold text-base truncate">
-                      {t.name}
-                    </h4>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <h4 className="font-semibold text-base truncate">
+                        {t.name}
+                      </h4>
+                      {showStatusBadge ? (
+                        <span
+                          className={`text-xs px-2 py-1 rounded-full shrink-0 ${statusBadge}`}
+                        >
+                          {statusLabel}
+                        </span>
+                      ) : null}
+                    </div>
                     <p className="text-sm text-slate-500 truncate">
                       {t.category_name || "Uncategorized"} •{" "}
                       {formatDate(t.date)}

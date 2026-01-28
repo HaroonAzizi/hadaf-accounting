@@ -5,11 +5,14 @@ import {
   transactionsAPI,
   type Transaction,
   type TransactionType,
+  type TransactionCreateInput,
+  type TransactionUpdateInput,
 } from "../services/api";
 
 export type TransactionFilters = {
   categoryId?: number;
   type?: TransactionType;
+  status?: "pending" | "done" | "cancelled" | "all";
   startDate?: string;
   endDate?: string;
   currency?: string;
@@ -41,12 +44,7 @@ export function useTransactions(initialFilters?: TransactionFilters) {
   );
 
   const createTransaction = useCallback(
-    async (
-      data: Omit<
-        Transaction,
-        "id" | "category_name" | "created_at" | "updated_at"
-      >,
-    ) => {
+    async (data: TransactionCreateInput) => {
       try {
         await transactionsAPI.create(data);
         toast.success("Transaction created");
@@ -61,12 +59,7 @@ export function useTransactions(initialFilters?: TransactionFilters) {
   );
 
   const updateTransaction = useCallback(
-    async (
-      id: number,
-      data: Partial<
-        Omit<Transaction, "id" | "category_name" | "created_at" | "updated_at">
-      >,
-    ) => {
+    async (id: number, data: TransactionUpdateInput) => {
       try {
         await transactionsAPI.update(id, data);
         toast.success("Transaction updated");

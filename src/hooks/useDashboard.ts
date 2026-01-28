@@ -1,21 +1,33 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 
-import { dashboardAPI, type DashboardSummary } from "../services/api";
+import {
+  dashboardAPI,
+  type DashboardSummary,
+  type Transaction,
+} from "../services/api";
 import type { DateRange } from "../context/AppContext";
 
 export function useDashboard(dateRange?: DateRange) {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [followUps, setFollowUps] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchSummary = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await dashboardAPI.getSummary({
+      const params = {
         startDate: dateRange?.startDate ?? undefined,
         endDate: dateRange?.endDate ?? undefined,
-      });
-      setSummary(res.data);
+      };
+
+      const [summaryRes, followRes] = await Promise.all([
+        dashboardAPI.getSummary(params),
+        dashboardAPI.getFollowUps(params),
+      ]);
+
+      setSummary(summaryRes.data);
+      setFollowUps(followRes.data);
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Failed to load dashboard",
@@ -30,7 +42,7 @@ export function useDashboard(dateRange?: DateRange) {
   }, [fetchSummary]);
 
   return useMemo(
-    () => ({ summary, loading, refetch: fetchSummary }),
-    [summary, loading, fetchSummary],
+    () => ({ summary, followUps, loading, refetch: fetchSummary }),
+    [summary, followUps, loading, fetchSummary],
   );
 }

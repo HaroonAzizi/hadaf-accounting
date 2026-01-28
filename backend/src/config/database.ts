@@ -53,20 +53,6 @@ function createSchema(database: Database.Database) {
       FOREIGN KEY (parent_id) REFERENCES categories(id) ON DELETE CASCADE
     );
 
-    CREATE TABLE IF NOT EXISTS transactions (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      category_id INTEGER NOT NULL,
-      amount REAL NOT NULL,
-      currency TEXT NOT NULL DEFAULT 'AFN',
-      type TEXT NOT NULL CHECK(type IN ('in', 'out')),
-      date DATE NOT NULL,
-      name TEXT NOT NULL,
-      description TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
-    );
-
     CREATE TABLE IF NOT EXISTS recurring_transactions (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       category_id INTEGER NOT NULL,
@@ -82,6 +68,23 @@ function createSchema(database: Database.Database) {
       FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
     );
 
+    CREATE TABLE IF NOT EXISTS transactions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      category_id INTEGER NOT NULL,
+      recurring_id INTEGER,
+      amount REAL NOT NULL,
+      currency TEXT NOT NULL DEFAULT 'AFN',
+      type TEXT NOT NULL CHECK(type IN ('in', 'out')),
+      status TEXT NOT NULL DEFAULT 'done' CHECK(status IN ('pending', 'done', 'cancelled')),
+      date DATE NOT NULL,
+      name TEXT NOT NULL,
+      description TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
+      FOREIGN KEY (recurring_id) REFERENCES recurring_transactions(id) ON DELETE SET NULL
+    );
+
     CREATE INDEX IF NOT EXISTS idx_transactions_category_id ON transactions(category_id);
     CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions(date);
     CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions(type);
@@ -90,6 +93,38 @@ function createSchema(database: Database.Database) {
     CREATE INDEX IF NOT EXISTS idx_recurring_next_due_date ON recurring_transactions(next_due_date);
     CREATE INDEX IF NOT EXISTS idx_recurring_is_active ON recurring_transactions(is_active);
   `);
+}
+
+function ensureTransactionStatusColumn(database: Database.Database) {
+  const columns = database
+    .prepare("PRAGMA table_info('transactions')")
+    .all() as Array<{ name: string }>;
+
+  const hasStatus = columns.some((c) => c.name === "status");
+  if (!hasStatus) {
+    database.exec(
+      "ALTER TABLE transactions ADD COLUMN status TEXT NOT NULL DEFAULT 'done'",
+    );
+  }
+
+  database.exec(
+    "CREATE INDEX IF NOT EXISTS idx_transactions_status ON transactions(status)",
+  );
+}
+
+function ensureTransactionRecurringIdColumn(database: Database.Database) {
+  const columns = database
+    .prepare("PRAGMA table_info('transactions')")
+    .all() as Array<{ name: string }>;
+
+  const hasRecurringId = columns.some((c) => c.name === "recurring_id");
+  if (!hasRecurringId) {
+    database.exec("ALTER TABLE transactions ADD COLUMN recurring_id INTEGER");
+  }
+
+  database.exec(
+    "CREATE INDEX IF NOT EXISTS idx_transactions_recurring_id ON transactions(recurring_id)",
+  );
 }
 
 function seedDefaults(database: Database.Database) {
@@ -115,6 +150,8 @@ export function initDatabase() {
   db = new Database(resolvedDatabasePath);
 
   createSchema(db);
+  ensureTransactionStatusColumn(db);
+  ensureTransactionRecurringIdColumn(db);
   seedDefaults(db);
 
   if (process.env.SEED_SAMPLE_DATA === "true") {

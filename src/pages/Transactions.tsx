@@ -60,6 +60,7 @@ export default function TransactionsPage() {
       amount: values.amount,
       currency: values.currency,
       type: values.type,
+      status: values.status,
       date: values.date,
       name: values.name,
       description: values.description || null,

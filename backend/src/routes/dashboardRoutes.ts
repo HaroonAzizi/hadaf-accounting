@@ -13,4 +13,11 @@ router.get(
   dashboardController.getSummary,
 );
 
+router.get(
+  "/followups",
+  validateDashboardQuery,
+  validateRequest,
+  dashboardController.getFollowUps,
+);
+
 export default router;

@@ -59,3 +59,28 @@ export function getSummary(req: Request, res: Response, next: NextFunction) {
     return next(e);
   }
 }
+
+export function getFollowUps(req: Request, res: Response, next: NextFunction) {
+  try {
+    const startDate = req.query.startDate
+      ? String(req.query.startDate)
+      : undefined;
+    const endDate = req.query.endDate ? String(req.query.endDate) : undefined;
+
+    const rows = transactionModel.getAllTransactions({
+      status: "pending",
+      type: "in",
+      startDate,
+      endDate,
+    });
+
+    const sorted = [...rows].sort((a, b) => a.date.localeCompare(b.date));
+
+    return sendSuccess(res, {
+      data: sorted,
+      message: "Follow-ups fetched",
+    });
+  } catch (e) {
+    return next(e);
+  }
+}

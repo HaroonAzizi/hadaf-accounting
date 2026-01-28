@@ -179,7 +179,7 @@ export function getCategoryWithStats(id: number) {
     .prepare(
       `SELECT type, currency, SUM(amount) as total
        FROM transactions
-       WHERE category_id = ?
+       WHERE category_id = ? AND status = 'done'
        GROUP BY type, currency`,
     )
     .all(id) as Array<{
