@@ -102,7 +102,7 @@ export function useRecurring() {
     async (id: number) => {
       try {
         await recurringAPI.execute(id);
-        toast.success("Recurring executed");
+        toast.success("Added to Follow-ups");
         await Promise.all([fetchAll(), fetchDue()]);
       } catch (err) {
         toast.error(

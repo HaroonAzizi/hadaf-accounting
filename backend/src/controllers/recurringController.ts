@@ -2,29 +2,10 @@ import type { Request, Response, NextFunction } from "express";
 
 import { sendSuccess } from "../utils/apiResponse";
 import { HttpError } from "../utils/httpErrors";
-import { addDays, addMonths, addYears, toISODateString } from "../utils/dates";
+import { toISODateString } from "../utils/dates";
 import { logger } from "../utils/logger";
 import * as recurringModel from "../models/recurringModel";
 import * as transactionModel from "../models/transactionModel";
-
-function nextDueDate(
-  currentIso: string,
-  frequency: "daily" | "weekly" | "monthly" | "yearly",
-) {
-  const [y, m, d] = currentIso.split("-").map((v) => Number(v));
-  const current = new Date(y, m - 1, d);
-
-  const next =
-    frequency === "daily"
-      ? addDays(current, 1)
-      : frequency === "weekly"
-        ? addDays(current, 7)
-        : frequency === "monthly"
-          ? addMonths(current, 1)
-          : addYears(current, 1);
-
-  return toISODateString(next);
-}
 
 export function getRecurring(req: Request, res: Response, next: NextFunction) {
   try {
@@ -206,31 +187,45 @@ export function executeRecurring(
       });
     }
 
-    const created = transactionModel.createTransaction({
-      category_id: recurring.category_id,
-      amount: recurring.amount,
-      currency: recurring.currency,
-      type: recurring.type,
-      date: recurring.next_due_date,
-      name: recurring.name,
-      description: recurring.description,
-    });
+    // "Execute" means: ensure there is a pending installment that can be
+    // later marked as done/cancelled from Follow-ups.
+    // Do NOT advance schedule here; schedule advances when the pending
+    // installment is closed.
+    const existing = transactionModel.getRecurringInstanceByDate(
+      recurring.id,
+      recurring.next_due_date,
+    );
 
-    const nextDate = nextDueDate(recurring.next_due_date, recurring.frequency);
-    const updated = recurringModel.updateNextDueDate(id, nextDate);
+    const pending =
+      existing && existing.status === "pending"
+        ? existing
+        : transactionModel.createTransaction({
+            category_id: recurring.category_id,
+            recurring_id: recurring.id,
+            amount: recurring.amount,
+            currency: recurring.currency,
+            type: recurring.type,
+            status: "pending",
+            date: recurring.next_due_date,
+            name: recurring.name,
+            description: recurring.description,
+          });
 
-    logger.info("Recurring executed", {
+    logger.info("Recurring enqueued", {
       id,
-      transaction_id: created?.id,
-      next_due_date: nextDate,
+      transaction_id: pending?.id,
+      next_due_date: recurring.next_due_date,
     });
 
     return sendSuccess(res, {
       data: {
-        transaction: created,
-        recurring: updated,
+        transaction: pending,
+        recurring,
       },
-      message: "Recurring transaction executed",
+      message:
+        existing && existing.status === "pending"
+          ? "Recurring installment already queued"
+          : "Recurring installment queued",
     });
   } catch (e) {
     return next(e);

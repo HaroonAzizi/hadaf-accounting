@@ -26,7 +26,7 @@ export default function TransactionsPage() {
     createTransaction,
     updateTransaction,
     deleteTransaction,
-  } = useTransactions();
+  } = useTransactions({ status: "all" });
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Transaction | null>(null);
@@ -103,8 +103,8 @@ export default function TransactionsPage() {
           setFilters={setFilters}
           onApply={() => void refetch(filters)}
           onReset={() => {
-            setFilters({});
-            void refetch({});
+            setFilters({ status: "all" });
+            void refetch({ status: "all" });
           }}
         />
 

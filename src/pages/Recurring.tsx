@@ -67,7 +67,7 @@ export default function RecurringPage() {
 
   const handleExecute = async (id: number) => {
     const ok = window.confirm(
-      "Execute this recurring item now? It will create a transaction.",
+      "Send this due item to Follow-ups? You'll mark it Done later.",
     );
     if (!ok) return;
     await executeRecurring(id);

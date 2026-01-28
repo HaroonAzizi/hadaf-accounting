@@ -69,7 +69,6 @@ export function getFollowUps(req: Request, res: Response, next: NextFunction) {
 
     const rows = transactionModel.getAllTransactions({
       status: "pending",
-      type: "in",
       startDate,
       endDate,
     });

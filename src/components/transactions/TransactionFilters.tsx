@@ -54,7 +54,23 @@ export function TransactionFilters({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
+        <Select
+          label="Status"
+          value={filters.status ?? "all"}
+          onChange={(e) =>
+            setFilters((prev) => ({
+              ...prev,
+              status: (e.target.value || "all") as TransactionStatus | "all",
+            }))
+          }
+        >
+          <option value="all">All</option>
+          <option value="done">Done</option>
+          <option value="pending">Pending</option>
+          <option value="cancelled">Cancelled</option>
+        </Select>
+
         <Select
           label="Type"
           value={filters.type ?? ""}

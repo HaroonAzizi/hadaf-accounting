@@ -42,6 +42,13 @@ function findRecurringInstance(recurringId: number, isoDate: string) {
   return row ?? null;
 }
 
+export function getRecurringInstanceByDate(
+  recurringId: number,
+  isoDate: string,
+) {
+  return findRecurringInstance(recurringId, isoDate);
+}
+
 export type TransactionFilters = {
   categoryId?: number;
   type?: TransactionType;
