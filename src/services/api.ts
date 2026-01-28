@@ -69,6 +69,9 @@ export type TransactionCreateInput = Omit<
   "id" | "category_name" | "created_at" | "updated_at"
 > & {
   status?: TransactionStatus;
+  recurring?: {
+    frequency: Frequency;
+  };
 };
 
 export type TransactionUpdateInput = Partial<

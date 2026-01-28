@@ -28,15 +28,16 @@ export function Button({
   ...props
 }: ButtonProps) {
   const baseStyles =
-    "font-medium text-slate-900 rounded-lg transition-all duration-200 inline-flex items-center justify-center gap-2 shadow-lg hover:shadow-xl active:scale-[0.99]";
+    "font-medium rounded-lg transition-all duration-200 inline-flex items-center justify-center gap-2 shadow-lg hover:shadow-xl active:scale-[0.99] focus:outline-none focus-visible:ring-4 focus-visible:ring-sky-500/20";
 
   const variants: Record<ButtonVariant, string> = {
     primary: "bg-sky-500 text-white hover:bg-sky-600",
     income: "bg-emerald-500 text-white hover:bg-emerald-600",
     expense: "bg-red-600 text-white hover:bg-red-700",
     outline:
-      "border-2 border-slate-200 text-slate-800 hover:border-sky-500 hover:text-sky-600",
-    ghost: "text-slate-800 hover:bg-slate-100 shadow-none",
+      "border-2 border-slate-200/80 dark:border-slate-800 text-slate-800 dark:text-slate-100 bg-white/40 dark:bg-slate-950/20 hover:border-sky-500 hover:text-sky-600 dark:hover:text-sky-300",
+    ghost:
+      "text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-900/70 shadow-none",
   };
 
   const sizes: Record<ButtonSize, string> = {

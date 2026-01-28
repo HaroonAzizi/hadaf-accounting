@@ -6,6 +6,7 @@ import { Calendar, DollarSign, FileText, User } from "lucide-react";
 
 import type {
   Category,
+  Frequency,
   Transaction,
   TransactionStatus,
   TransactionType,
@@ -16,19 +17,33 @@ import { Button } from "../common/Button";
 import { Input } from "../common/Input";
 import { Select } from "../common/Select";
 
-const schema = z.object({
-  type: z.enum(["in", "out"]),
-  status: z.enum(["pending", "done", "cancelled"]),
-  category_id: z.coerce
-    .number()
-    .int()
-    .positive({ message: "Category is required" }),
-  amount: z.coerce.number().positive({ message: "Amount is required" }),
-  currency: z.string().min(1),
-  date: z.string().min(1, { message: "Date is required" }),
-  name: z.string().min(1, { message: "Name is required" }),
-  description: z.string().optional(),
-});
+const schema = z
+  .object({
+    type: z.enum(["in", "out"]),
+    status: z.enum(["pending", "done", "cancelled"]),
+    category_id: z.coerce
+      .number()
+      .int()
+      .positive({ message: "Category is required" }),
+    amount: z.coerce.number().positive({ message: "Amount is required" }),
+    currency: z.string().min(1),
+    date: z.string().min(1, { message: "Date is required" }),
+    name: z.string().min(1, { message: "Name is required" }),
+    description: z.string().optional(),
+    is_recurring: z.boolean().default(false),
+    recurring_frequency: z
+      .enum(["daily", "weekly", "monthly", "yearly"])
+      .default("monthly"),
+  })
+  .superRefine((val, ctx) => {
+    if (val.is_recurring && val.status === "pending") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["status"],
+        message: "Recurring setup requires the first payment to be Done.",
+      });
+    }
+  });
 
 type TransactionFormInput = z.input<typeof schema>;
 export type TransactionFormValues = z.infer<typeof schema>;
@@ -53,16 +68,21 @@ export function TransactionForm({
     date: initialData?.date ?? new Date().toISOString().slice(0, 10),
     name: initialData?.name ?? "",
     description: initialData?.description ?? "",
+    is_recurring: false,
+    recurring_frequency: "monthly" as Frequency,
   };
 
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<TransactionFormInput>({
     resolver: zodResolver(schema),
     defaultValues,
   });
+
+  const isRecurring = watch("is_recurring");
 
   return (
     <form
@@ -186,6 +206,51 @@ export function TransactionForm({
           />
         </div>
       </div>
+
+      {!initialData ? (
+        <div className="rounded-xl border-2 border-slate-200 bg-white p-4">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <label className="text-sm font-medium text-slate-800">
+                Make this recurring
+              </label>
+              <p className="text-xs text-slate-500 mt-1">
+                Creates the next installment as a pending follow-up.
+              </p>
+            </div>
+
+            <label className="inline-flex items-center gap-2 select-none">
+              <input
+                type="checkbox"
+                className="h-4 w-4"
+                {...register("is_recurring")}
+              />
+              <span className="text-sm text-slate-700">Recurring</span>
+            </label>
+          </div>
+
+          {isRecurring ? (
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Select
+                label="Frequency"
+                error={errors.recurring_frequency?.message}
+                {...register("recurring_frequency")}
+              >
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+                <option value="weekly">Weekly</option>
+                <option value="daily">Daily</option>
+              </Select>
+            </div>
+          ) : null}
+        </div>
+      ) : (
+        <div className="rounded-xl border-2 border-slate-200 bg-slate-50 p-4">
+          <p className="text-sm text-slate-600">
+            Recurring setup is available when creating a new transaction.
+          </p>
+        </div>
+      )}
 
       <Button
         type="submit"

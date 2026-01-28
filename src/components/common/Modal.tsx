@@ -45,13 +45,15 @@ export function Modal({
       aria-modal="true"
     >
       <div
-        className={`w-full ${sizes[size]} bg-white rounded-2xl shadow-2xl animate-slide-in-up`}
+        className={`w-full ${sizes[size]} bg-white dark:bg-slate-950 rounded-2xl border border-slate-200/70 dark:border-slate-800/70 shadow-2xl animate-slide-in-up`}
       >
-        <div className="flex items-center justify-between p-6 border-b border-slate-200">
-          <h2 className="text-2xl font-bold font-display">{title}</h2>
+        <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
+          <h2 className="text-2xl font-bold font-display text-slate-900 dark:text-slate-100">
+            {title}
+          </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-lg transition-colors"
             aria-label="Close"
             type="button"
           >

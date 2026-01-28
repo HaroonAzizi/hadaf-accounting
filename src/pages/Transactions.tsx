@@ -64,6 +64,9 @@ export default function TransactionsPage() {
       date: values.date,
       name: values.name,
       description: values.description || null,
+      recurring: values.is_recurring
+        ? { frequency: values.recurring_frequency }
+        : undefined,
     };
 
     if (editing) {

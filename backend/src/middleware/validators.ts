@@ -26,6 +26,11 @@ export const validateTransactionCreate = [
   body("date").isISO8601({ strict: true }),
   body("name").isString().trim().notEmpty(),
   body("description").optional({ nullable: true }).isString(),
+  body("recurring").optional().isObject(),
+  body("recurring.frequency")
+    .optional()
+    .isString()
+    .isIn(["daily", "weekly", "monthly", "yearly"]),
 ];
 
 export const validateTransactionUpdate = [

@@ -4,6 +4,9 @@ import { sendSuccess } from "../utils/apiResponse";
 import { HttpError } from "../utils/httpErrors";
 import { logger } from "../utils/logger";
 import * as transactionModel from "../models/transactionModel";
+import * as recurringModel from "../models/recurringModel";
+import { nextDueDate as computeNextDueDate } from "../utils/recurring";
+import { getDb } from "../config/database";
 
 export function getTransactions(
   req: Request,
@@ -80,9 +83,97 @@ export function createTransaction(
       date: string;
       name: string;
       description?: string | null;
+      recurring?: {
+        frequency: "daily" | "weekly" | "monthly" | "yearly";
+      };
     };
 
     const date = String(body.date).split("T")[0];
+
+    // When a transaction is marked as recurring, we create a recurring template
+    // and also create the next pending installment for dashboard follow-ups.
+    if (body.recurring?.frequency) {
+      if (body.status === "pending") {
+        throw new HttpError({
+          status: 400,
+          code: "INVALID_STATUS",
+          message:
+            "Recurring setup requires the first transaction to be paid (status: done).",
+        });
+      }
+
+      const db = getDb();
+      const create = db.transaction(() => {
+        const next_due_date = computeNextDueDate(
+          date,
+          body.recurring!.frequency,
+        );
+
+        const recurring = recurringModel.createRecurring({
+          category_id: body.category_id,
+          amount: body.amount,
+          currency: body.currency,
+          type: body.type,
+          name: body.name,
+          description: body.description ?? null,
+          frequency: body.recurring!.frequency,
+          next_due_date,
+          is_active: true,
+        });
+
+        if (!recurring) {
+          throw new HttpError({
+            status: 500,
+            code: "RECURRING_CREATE_FAILED",
+            message: "Failed to create recurring transaction",
+          });
+        }
+
+        const first = transactionModel.createTransaction({
+          category_id: body.category_id,
+          recurring_id: recurring.id,
+          amount: body.amount,
+          currency: body.currency,
+          type: body.type,
+          status: body.status ?? "done",
+          date,
+          name: body.name,
+          description: body.description ?? null,
+        });
+
+        transactionModel.createTransaction({
+          category_id: recurring.category_id,
+          recurring_id: recurring.id,
+          amount: recurring.amount,
+          currency: recurring.currency,
+          type: recurring.type,
+          status: "pending",
+          date: recurring.next_due_date,
+          name: recurring.name,
+          description: recurring.description,
+        });
+
+        return { first, recurring };
+      });
+
+      const { first, recurring } = create();
+
+      logger.info("Transaction created (recurring)", {
+        id: first?.id,
+        recurring_id: recurring.id,
+        category_id: first?.category_id,
+        amount: first?.amount,
+        currency: first?.currency,
+        type: first?.type,
+        next_due_date: recurring.next_due_date,
+      });
+
+      return sendSuccess(res, {
+        status: 201,
+        data: first,
+        message: "Transaction created",
+      });
+    }
 
     const row = transactionModel.createTransaction({
       category_id: body.category_id,

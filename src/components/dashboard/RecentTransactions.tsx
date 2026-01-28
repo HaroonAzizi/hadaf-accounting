@@ -24,10 +24,10 @@ export function RecentTransactions({
           const showStatusBadge = t.status !== "done";
           const statusBadge =
             t.status === "pending"
-              ? "bg-amber-100 text-amber-700"
+              ? "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-200"
               : t.status === "cancelled"
-                ? "bg-slate-100 text-slate-700"
-                : "bg-emerald-100 text-emerald-700";
+                ? "bg-slate-100 text-slate-700 dark:bg-slate-800/60 dark:text-slate-200"
+                : "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-200";
           const statusLabel =
             t.status === "pending"
               ? "Pending"
@@ -37,7 +37,7 @@ export function RecentTransactions({
           return (
             <div
               key={t.id}
-              className="group p-4 rounded-xl border-2 border-slate-100 hover:border-sky-500/20 hover:shadow-md transition-all"
+              className="group p-4 rounded-xl border-2 border-slate-100/90 dark:border-slate-800/70 hover:border-sky-500/20 dark:hover:border-sky-500/30 hover:shadow-md transition-all"
             >
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-4 min-w-0">
@@ -66,7 +66,7 @@ export function RecentTransactions({
                         </span>
                       ) : null}
                     </div>
-                    <p className="text-sm text-slate-500 truncate">
+                    <p className="text-sm text-slate-500 dark:text-slate-400 truncate">
                       {t.category_name || "Uncategorized"} •{" "}
                       {formatDate(t.date)}
                     </p>
@@ -84,7 +84,7 @@ export function RecentTransactions({
                       (t.currency as CurrencyCode) || currencyFallback,
                     )}
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     {isIncome ? "Income" : "Expense"}
                   </p>
                 </div>

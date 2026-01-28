@@ -14,9 +14,10 @@ import { Loading } from "../components/common/Loading";
 import { useAppContext } from "../context/AppContext";
 import { useDashboard } from "../hooks/useDashboard";
 import { useTransactions } from "../hooks/useTransactions";
+import { Moon, Sun } from "lucide-react";
 
 export default function DashboardPage() {
-  const { dateRange } = useAppContext();
+  const { dateRange, theme, toggleTheme } = useAppContext();
   const {
     summary,
     followUps,
@@ -86,10 +87,28 @@ export default function DashboardPage() {
             <h1 className="text-3xl font-bold font-display tracking-tight">
               Dashboard
             </h1>
-            <p className="text-slate-600 mt-1">
+            <p className="text-slate-600 dark:text-slate-300 mt-1">
               Income, expenses, and profit — in one glance.
             </p>
           </div>
+
+          <button
+            onClick={toggleTheme}
+            type="button"
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-200/70 dark:border-slate-800/70 bg-white/70 dark:bg-slate-950/40 backdrop-blur hover:bg-white dark:hover:bg-slate-900 transition-colors"
+            aria-label={
+              theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+            }
+          >
+            {theme === "dark" ? (
+              <Sun size={18} className="text-slate-200" />
+            ) : (
+              <Moon size={18} className="text-slate-700" />
+            )}
+            <span className="text-sm font-medium text-slate-800 dark:text-slate-100">
+              {theme === "dark" ? "Light" : "Dark"}
+            </span>
+          </button>
         </header>
 
         {dashboardLoading || !summary ? (

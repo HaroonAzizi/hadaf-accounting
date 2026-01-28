@@ -6,7 +6,8 @@ export function Layout({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#f9fafb]">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(60%_50%_at_50%_0%,rgba(14,165,233,0.18),rgba(14,165,233,0))] dark:bg-[radial-gradient(60%_50%_at_50%_0%,rgba(14,165,233,0.20),rgba(14,165,233,0))]" />
       <Navbar onMenuClick={() => setSidebarOpen(true)} />
       <div className="flex">
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
