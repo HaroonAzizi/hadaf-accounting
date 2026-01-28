@@ -22,7 +22,7 @@ export const validateTransactionCreate = [
     .isString()
     .isIn([...allowedCurrencies]),
   body("type").isString().isIn(["in", "out"]),
-  body("date").isISO8601({ strict: true }).toDate(),
+  body("date").isISO8601({ strict: true }),
   body("name").isString().trim().notEmpty(),
   body("description").optional({ nullable: true }).isString(),
 ];
@@ -35,7 +35,7 @@ export const validateTransactionUpdate = [
     .isString()
     .isIn([...allowedCurrencies]),
   body("type").optional().isString().isIn(["in", "out"]),
-  body("date").optional().isISO8601({ strict: true }).toDate(),
+  body("date").optional().isISO8601({ strict: true }),
   body("name").optional().isString().trim().notEmpty(),
   body("description").optional({ nullable: true }).isString(),
 ];
@@ -50,7 +50,7 @@ export const validateRecurringCreate = [
   body("name").isString().trim().notEmpty(),
   body("description").optional({ nullable: true }).isString(),
   body("frequency").isString().isIn(["daily", "weekly", "monthly", "yearly"]),
-  body("next_due_date").isISO8601({ strict: true }).toDate(),
+  body("next_due_date").isISO8601({ strict: true }),
   body("is_active").optional().isBoolean().toBoolean(),
 ];
 
@@ -68,7 +68,7 @@ export const validateRecurringUpdate = [
     .optional()
     .isString()
     .isIn(["daily", "weekly", "monthly", "yearly"]),
-  body("next_due_date").optional().isISO8601({ strict: true }).toDate(),
+  body("next_due_date").optional().isISO8601({ strict: true }),
   body("is_active").optional().isBoolean().toBoolean(),
 ];
 

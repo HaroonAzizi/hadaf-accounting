@@ -27,6 +27,13 @@ Environment:
 
 - Copy `backend/.env.example` to `backend/.env`
 - `DATABASE_PATH=./hadaf.db` creates `backend/hadaf.db`
+- `SEED_SAMPLE_DATA=true` seeds sample transactions when the DB has none
+
+From the repo root you can start both servers with:
+
+```bash
+npm run dev
+```
 
 ## Useful endpoints
 

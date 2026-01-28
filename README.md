@@ -1,74 +1,98 @@
-# React + TypeScript + Vite
+# Hadaf Accounting System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Modern accounting system for tracking income, expenses, profit margins, and recurring transactions.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Frontend: React + Vite + Tailwind
+- Backend: Node.js + Express + SQLite (better-sqlite3)
 
-## React Compiler
+## Quick Start
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Prerequisites
 
-## Expanding the ESLint configuration
+- Node.js 18+
+- npm
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Install
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+````bash
+# root deps (frontend + tooling)
+npm install
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+# backend deps
+npm --prefix backend install
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+
+Backend env:
+
+- Copy [backend/.env.example](backend/.env.example) to [backend/.env](backend/.env)
+- If port 5000 is in use on your machine, change `PORT` (macOS may already occupy 5000)
+
+Frontend env:
+
+- [./.env](.env) sets `VITE_API_URL` (defaults to `http://localhost:5001/api` in this repo)
+
+### Run (recommended)
+
+Starts both servers in one command:
+
+```bash
+npm run dev
+````
+
+- Frontend: `http://localhost:5173`
+- Backend API: `http://localhost:5001/api` (or whatever `PORT` you set)
+
+### Run separately
+
+```bash
+# frontend only
+npm run dev:frontend
+
+# backend only
+npm run dev:backend
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Build + Start (Production-like)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run build:all
+npm run start
 ```
-# hadaf-accounting
+
+## Sample Data (Step 5)
+
+The backend can seed sample transactions when the database has zero transactions:
+
+- Set `SEED_SAMPLE_DATA=true` in [backend/.env](backend/.env)
+- To re-seed from scratch: delete `backend/hadaf.db` and restart the backend
+
+## API Endpoints
+
+- Health: `GET /api/health`
+- Categories: `GET/POST /api/categories`, `PUT/DELETE /api/categories/:id`
+- Transactions: `GET/POST /api/transactions`, `PUT/DELETE /api/transactions/:id`
+- Dashboard: `GET /api/dashboard/summary`
+- Recurring: `GET/POST /api/recurring`, `PUT/DELETE /api/recurring/:id`, `POST /api/recurring/:id/execute`, `GET /api/recurring/due`
+- Export: `GET /api/export/csv`, `GET /api/export/backup`
+
+## Full Application Test Script (Step 7)
+
+Journey: “New Student Enrollment”
+
+1. Open dashboard → summary loads
+2. Create or verify a category (e.g. “German Class”)
+3. Create an income transaction (e.g. 3000 AFN)
+4. Create an expense transaction (e.g. 1500 AFN teacher payment)
+5. Return to dashboard → totals and category breakdown reflect the changes
+6. Create a recurring transaction → execute if due
+7. Export CSV from Reports
+
+## Verification Checklist (Step 10)
+
+- No CORS errors in browser console
+- CRUD works: Categories / Transactions / Recurring
+- Dashboard loads and updates after changes
+- Filters affect transactions listing
+- Export CSV downloads successfully

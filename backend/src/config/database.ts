@@ -2,6 +2,7 @@ import path from "path";
 import Database from "better-sqlite3";
 
 import { HttpError } from "../utils/httpErrors";
+import { seedSampleData } from "./seedData";
 
 let db: Database.Database | null = null;
 let resolvedDatabasePath: string | null = null;
@@ -115,6 +116,10 @@ export function initDatabase() {
 
   createSchema(db);
   seedDefaults(db);
+
+  if (process.env.SEED_SAMPLE_DATA === "true") {
+    seedSampleData(db);
+  }
 
   return db;
 }

@@ -69,9 +69,11 @@ export function createRecurring(
       name: string;
       description?: string | null;
       frequency: "daily" | "weekly" | "monthly" | "yearly";
-      next_due_date: Date;
+      next_due_date: string;
       is_active?: boolean;
     };
+
+    const next_due_date = String(body.next_due_date).split("T")[0];
 
     const row = recurringModel.createRecurring({
       category_id: body.category_id,
@@ -81,7 +83,7 @@ export function createRecurring(
       name: body.name,
       description: body.description ?? null,
       frequency: body.frequency,
-      next_due_date: toISODateString(body.next_due_date),
+      next_due_date,
       is_active: body.is_active,
     });
 
@@ -117,7 +119,7 @@ export function updateRecurring(
       name?: string;
       description?: string | null;
       frequency?: "daily" | "weekly" | "monthly" | "yearly";
-      next_due_date?: Date;
+      next_due_date?: string;
       is_active?: boolean;
     };
 
@@ -130,7 +132,7 @@ export function updateRecurring(
       description: body.description,
       frequency: body.frequency,
       next_due_date: body.next_due_date
-        ? toISODateString(body.next_due_date)
+        ? String(body.next_due_date).split("T")[0]
         : undefined,
       is_active: body.is_active,
     });

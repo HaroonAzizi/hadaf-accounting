@@ -2,7 +2,6 @@ import type { Request, Response, NextFunction } from "express";
 
 import { sendSuccess } from "../utils/apiResponse";
 import { HttpError } from "../utils/httpErrors";
-import { toISODateString } from "../utils/dates";
 import { logger } from "../utils/logger";
 import * as transactionModel from "../models/transactionModel";
 
@@ -70,12 +69,12 @@ export function createTransaction(
       amount: number;
       currency: string;
       type: "in" | "out";
-      date: Date;
+      date: string;
       name: string;
       description?: string | null;
     };
 
-    const date = toISODateString(body.date);
+    const date = String(body.date).split("T")[0];
 
     const row = transactionModel.createTransaction({
       category_id: body.category_id,
@@ -117,7 +116,7 @@ export function updateTransaction(
       amount?: number;
       currency?: string;
       type?: "in" | "out";
-      date?: Date;
+      date?: string;
       name?: string;
       description?: string | null;
     };
@@ -127,7 +126,7 @@ export function updateTransaction(
       amount: body.amount,
       currency: body.currency,
       type: body.type,
-      date: body.date ? toISODateString(body.date) : undefined,
+      date: body.date ? String(body.date).split("T")[0] : undefined,
       name: body.name,
       description: body.description,
     });
