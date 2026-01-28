@@ -21,6 +21,18 @@ export function sumByCurrency(
   }, {});
 }
 
+export function groupByCurrency(
+  amounts: Array<{ amount: number; currency: string }>,
+) {
+  return sumByCurrency(amounts);
+}
+
+export function calculateTotalByCurrency(
+  transactions: Array<{ amount: number; currency: string }>,
+) {
+  return sumByCurrency(transactions);
+}
+
 export function groupProfitByCategory(rows: TransactionRow[]) {
   const byCategory = new Map<
     number,
@@ -63,6 +75,10 @@ export function groupProfitByCategory(rows: TransactionRow[]) {
   );
 }
 
+export function calculateProfitByCategory(transactions: TransactionRow[]) {
+  return groupProfitByCategory(transactions);
+}
+
 export function groupMonthlyBreakdown(rows: TransactionRow[]) {
   const byMonth = new Map<
     string,
@@ -100,4 +116,8 @@ export function groupMonthlyBreakdown(rows: TransactionRow[]) {
   return Array.from(byMonth.values()).sort((a, b) =>
     a.month.localeCompare(b.month),
   );
+}
+
+export function calculateMonthlyBreakdown(transactions: TransactionRow[]) {
+  return groupMonthlyBreakdown(transactions);
 }

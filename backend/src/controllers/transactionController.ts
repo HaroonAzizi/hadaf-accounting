@@ -3,6 +3,7 @@ import type { Request, Response, NextFunction } from "express";
 import { sendSuccess } from "../utils/apiResponse";
 import { HttpError } from "../utils/httpErrors";
 import { toISODateString } from "../utils/dates";
+import { logger } from "../utils/logger";
 import * as transactionModel from "../models/transactionModel";
 
 export function getTransactions(
@@ -86,6 +87,14 @@ export function createTransaction(
       description: body.description ?? null,
     });
 
+    logger.info("Transaction created", {
+      id: row?.id,
+      category_id: row?.category_id,
+      amount: row?.amount,
+      currency: row?.currency,
+      type: row?.type,
+    });
+
     return sendSuccess(res, {
       status: 201,
       data: row,
@@ -123,6 +132,11 @@ export function updateTransaction(
       description: body.description,
     });
 
+    logger.info("Transaction updated", {
+      id: row?.id,
+      category_id: row?.category_id,
+    });
+
     return sendSuccess(res, { data: row, message: "Transaction updated" });
   } catch (e) {
     return next(e);
@@ -137,6 +151,7 @@ export function deleteTransaction(
   try {
     const id = Number(req.params.id);
     transactionModel.deleteTransaction(id);
+    logger.info("Transaction deleted", { id });
     return sendSuccess(res, { data: true, message: "Transaction deleted" });
   } catch (e) {
     return next(e);

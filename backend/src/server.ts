@@ -7,11 +7,17 @@ dotenv.config({
 
 import app from "./app";
 import { initDatabase } from "./config/database";
+import { logger } from "./utils/logger";
 
 const port = Number(process.env.PORT) || 5000;
 
-initDatabase();
+try {
+  initDatabase();
+} catch (err) {
+  logger.error("Failed to initialize database", err);
+  process.exit(1);
+}
 
 app.listen(port, () => {
-  console.log(`Hadaf backend listening on http://localhost:${port}`);
+  logger.info(`Hadaf backend listening on http://localhost:${port}`);
 });

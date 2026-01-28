@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { sendError } from "../utils/apiResponse";
+import { logger } from "../utils/logger";
 
 export function notFoundHandler(req: Request, res: Response) {
   return sendError(res, {
@@ -31,7 +32,7 @@ export function errorHandler(
       : "Internal server error";
   const details = maybeErr.details;
 
-  console.error(err);
+  logger.error("Unhandled error", err);
 
   return sendError(res, { status, code, message, details });
 }

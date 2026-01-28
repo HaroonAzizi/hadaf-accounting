@@ -1,6 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
 
 import { sendSuccess } from "../utils/apiResponse";
+import { HttpError } from "../utils/httpErrors";
+import { logger } from "../utils/logger";
 import * as categoryModel from "../models/categoryModel";
 
 export function getCategories(req: Request, res: Response, next: NextFunction) {
@@ -24,9 +26,9 @@ export function getCategoryById(
     const id = Number(req.params.id);
     const category = categoryModel.getCategoryById(id);
     if (!category) {
-      return sendSuccess(res, {
+      throw new HttpError({
         status: 404,
-        data: null,
+        code: "NOT_FOUND",
         message: "Category not found",
       });
     }
@@ -66,6 +68,7 @@ export function createCategory(
       parentId: parentId ?? null,
       type,
     });
+    logger.info("Category created", { id: category?.id, name: category?.name });
     return sendSuccess(res, {
       status: 201,
       data: category,
@@ -88,6 +91,7 @@ export function updateCategory(
       parentId?: number | null;
     };
     const category = categoryModel.updateCategory({ id, name, parentId });
+    logger.info("Category updated", { id: category?.id, name: category?.name });
     return sendSuccess(res, { data: category, message: "Category updated" });
   } catch (e) {
     return next(e);
@@ -102,6 +106,7 @@ export function deleteCategory(
   try {
     const id = Number(req.params.id);
     categoryModel.deleteCategory(id);
+    logger.info("Category deleted", { id });
     return sendSuccess(res, { data: true, message: "Category deleted" });
   } catch (e) {
     return next(e);

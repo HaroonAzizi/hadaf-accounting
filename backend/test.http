@@ -1,0 +1,59 @@
+### Health
+GET http://localhost:5000/api/health
+
+### Get Categories (seeded)
+GET http://localhost:5000/api/categories
+
+### Create Category
+POST http://localhost:5000/api/categories
+Content-Type: application/json
+
+{
+  "name": "German Class",
+  "type": "default"
+}
+
+### Create Transaction
+POST http://localhost:5000/api/transactions
+Content-Type: application/json
+
+{
+  "category_id": 1,
+  "amount": 3000,
+  "currency": "AFN",
+  "type": "in",
+  "date": "2026-01-28",
+  "name": "Ghulaam",
+  "description": "German class fee"
+}
+
+### Get Dashboard Summary
+GET http://localhost:5000/api/dashboard/summary?startDate=2026-01-01&endDate=2026-01-31
+
+### Export CSV
+GET http://localhost:5000/api/export/csv?categoryId=1
+
+### Backup DB
+GET http://localhost:5000/api/export/backup
+
+### Create Recurring
+POST http://localhost:5000/api/recurring
+Content-Type: application/json
+
+{
+  "category_id": 1,
+  "amount": 1000,
+  "currency": "AFN",
+  "type": "in",
+  "name": "Monthly Fee",
+  "description": "Recurring class fee",
+  "frequency": "monthly",
+  "next_due_date": "2026-01-28",
+  "is_active": true
+}
+
+### Get Due Recurring
+GET http://localhost:5000/api/recurring/due
+
+### Execute Recurring (change :id)
+POST http://localhost:5000/api/recurring/1/execute

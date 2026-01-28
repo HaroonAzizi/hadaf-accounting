@@ -3,6 +3,7 @@ import type { Request, Response, NextFunction } from "express";
 import { sendSuccess } from "../utils/apiResponse";
 import { HttpError } from "../utils/httpErrors";
 import { addDays, addMonths, addYears, toISODateString } from "../utils/dates";
+import { logger } from "../utils/logger";
 import * as recurringModel from "../models/recurringModel";
 import * as transactionModel from "../models/transactionModel";
 
@@ -84,6 +85,13 @@ export function createRecurring(
       is_active: body.is_active,
     });
 
+    logger.info("Recurring created", {
+      id: row?.id,
+      category_id: row?.category_id,
+      frequency: row?.frequency,
+      next_due_date: row?.next_due_date,
+    });
+
     return sendSuccess(res, {
       status: 201,
       data: row,
@@ -127,6 +135,11 @@ export function updateRecurring(
       is_active: body.is_active,
     });
 
+    logger.info("Recurring updated", {
+      id: row?.id,
+      category_id: row?.category_id,
+    });
+
     return sendSuccess(res, {
       data: row,
       message: "Recurring transaction updated",
@@ -144,6 +157,7 @@ export function deleteRecurring(
   try {
     const id = Number(req.params.id);
     recurringModel.deleteRecurring(id);
+    logger.info("Recurring deleted", { id });
     return sendSuccess(res, {
       data: true,
       message: "Recurring transaction deleted",
@@ -187,6 +201,12 @@ export function executeRecurring(
 
     const nextDate = nextDueDate(recurring.next_due_date, recurring.frequency);
     const updated = recurringModel.updateNextDueDate(id, nextDate);
+
+    logger.info("Recurring executed", {
+      id,
+      transaction_id: created?.id,
+      next_due_date: nextDate,
+    });
 
     return sendSuccess(res, {
       data: {
