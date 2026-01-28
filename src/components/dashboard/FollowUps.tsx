@@ -17,6 +17,18 @@ export function FollowUps({
   onCancel: (id: number) => void;
   busyIds?: Set<number>;
 }) {
+  const startOfToday = () => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  };
+
+  const daysUntil = (isoDate: string) => {
+    const due = new Date(`${isoDate}T00:00:00`);
+    const today = startOfToday();
+    const msPerDay = 24 * 60 * 60 * 1000;
+    return Math.round((due.getTime() - today.getTime()) / msPerDay);
+  };
+
   return (
     <Card className="p-6">
       <div className="flex items-center justify-between gap-4 mb-4">
@@ -38,6 +50,18 @@ export function FollowUps({
           {items.map((t) => {
             const isBusy = busyIds?.has(t.id) ?? false;
             const isIncome = t.type === "in";
+            const isRecurring = Boolean(t.recurring_id);
+            const dueInDays = isRecurring ? daysUntil(t.date) : null;
+            const showDueSoon =
+              isRecurring &&
+              dueInDays !== null &&
+              dueInDays >= 0 &&
+              dueInDays <= 3;
+            const dueSoonLabel = !showDueSoon
+              ? null
+              : dueInDays === 0
+                ? "Due today"
+                : `Due in ${dueInDays} day${dueInDays === 1 ? "" : "s"}`;
 
             return (
               <div
@@ -47,9 +71,19 @@ export function FollowUps({
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 min-w-0">
                     <h4 className="font-semibold truncate">{t.name}</h4>
+                    {isRecurring ? (
+                      <span className="text-xs px-2 py-1 rounded-full bg-sky-100 text-sky-700 shrink-0">
+                        Recurring
+                      </span>
+                    ) : null}
                     <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700 shrink-0">
                       Pending
                     </span>
+                    {showDueSoon && dueSoonLabel ? (
+                      <span className="text-xs px-2 py-1 rounded-full bg-rose-100 text-rose-700 shrink-0">
+                        {dueSoonLabel}
+                      </span>
+                    ) : null}
                   </div>
                   <p className="text-sm text-slate-500 truncate">
                     {(t.category_name || "Uncategorized") +

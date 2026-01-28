@@ -9,8 +9,8 @@ import { NavLink } from "react-router-dom";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
-  { icon: FolderOpen, label: "Categories", path: "/categories" },
   { icon: Receipt, label: "Transactions", path: "/transactions" },
+  { icon: FolderOpen, label: "Categories", path: "/categories" },
   { icon: FileText, label: "Reports", path: "/reports" },
 ] as const;
 
@@ -67,7 +67,10 @@ export function Sidebar({
 
           <div className="pt-6 border-t border-slate-200">
             <p className="text-xs text-slate-500 text-center">
-              Hadaf Accounting v1.0
+              Hadaf Accounting - By{" "}
+              <a className="hover: text-black" href="https://code.af">
+                code.af
+              </a>
             </p>
           </div>
         </div>

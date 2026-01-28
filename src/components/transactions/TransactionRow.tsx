@@ -14,6 +14,7 @@ export function TransactionRow({
   onDelete: (id: number) => void;
 }) {
   const isIncome = transaction.type === "in";
+  const isRecurring = Boolean(transaction.recurring_id);
   const showStatusBadge = transaction.status !== "done";
   const statusBadge =
     transaction.status === "pending"
@@ -49,6 +50,15 @@ export function TransactionRow({
               <h4 className="font-semibold text-lg truncate">
                 {transaction.name}
               </h4>
+              <span
+                className={`text-xs px-2 py-1 rounded-full shrink-0 ${
+                  isRecurring
+                    ? "bg-sky-100 text-sky-700"
+                    : "bg-slate-100 text-slate-700"
+                }`}
+              >
+                {isRecurring ? "Recurring" : "One-time"}
+              </span>
               {showStatusBadge ? (
                 <span
                   className={`text-xs px-2 py-1 rounded-full shrink-0 ${statusBadge}`}

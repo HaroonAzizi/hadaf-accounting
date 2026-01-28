@@ -7,6 +7,19 @@ import {
   groupProfitByCategory,
 } from "../utils/calculations";
 
+function toIsoDateLocal(d: Date) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+function addDaysLocal(d: Date, days: number) {
+  const next = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
 function currencyTotalsFromRows(
   rows: Array<{ currency: string; amount: number }>,
 ) {
@@ -62,10 +75,13 @@ export function getSummary(req: Request, res: Response, next: NextFunction) {
 
 export function getFollowUps(req: Request, res: Response, next: NextFunction) {
   try {
-    const startDate = req.query.startDate
-      ? String(req.query.startDate)
-      : undefined;
-    const endDate = req.query.endDate ? String(req.query.endDate) : undefined;
+    // Follow-ups are meant as an operational reminder list, independent of the
+    // dashboard date range filters: show recurring installments due soon.
+    const today = new Date();
+    const startDate = toIsoDateLocal(
+      new Date(today.getFullYear(), today.getMonth(), today.getDate()),
+    );
+    const endDate = toIsoDateLocal(addDaysLocal(today, 3));
 
     const rows = transactionModel.getAllTransactions({
       status: "pending",
@@ -73,7 +89,11 @@ export function getFollowUps(req: Request, res: Response, next: NextFunction) {
       endDate,
     });
 
-    const sorted = [...rows].sort((a, b) => a.date.localeCompare(b.date));
+    const recurringOnly = rows.filter((r) => r.recurring_id !== null);
+
+    const sorted = [...recurringOnly].sort((a, b) =>
+      a.date.localeCompare(b.date),
+    );
 
     return sendSuccess(res, {
       data: sorted,
