@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import toast from "react-hot-toast";
 
 import { Layout } from "../components/layout/Layout";
 import { Loading } from "../components/common/Loading";
@@ -14,7 +15,12 @@ import { TransactionRow } from "../components/transactions/TransactionRow";
 
 import { useCategories } from "../hooks/useCategories";
 import { useTransactions } from "../hooks/useTransactions";
-import type { Transaction } from "../services/api";
+import {
+  transactionsAPI,
+  type Transaction,
+  type TransactionCreateInput,
+  type TransactionUpdateInput,
+} from "../services/api";
 
 function monthRange(month: string | null) {
   if (!month) return { startDate: undefined, endDate: undefined };
@@ -36,16 +42,13 @@ export default function ExpensesPage() {
   );
   const { startDate, endDate } = useMemo(() => monthRange(month), [month]);
 
-  const {
-    transactions,
-    loading: txLoading,
-    filters,
-    setFilters,
-    createTransaction,
-    updateTransaction,
-    deleteTransaction,
-  } = useTransactions({
-    status: "all",
+  const pendingQuery = useTransactions({
+    status: "pending",
+    type: "out",
+  });
+
+  const doneQuery = useTransactions({
+    status: "done",
     type: "out",
     startDate,
     endDate,
@@ -53,32 +56,37 @@ export default function ExpensesPage() {
 
   useEffect(() => {
     const next = {
-      status: "all" as const,
+      status: "done" as const,
       type: "out" as const,
       startDate,
       endDate,
     };
 
     const alreadySame =
-      filters.status === next.status &&
-      filters.type === next.type &&
-      filters.startDate === next.startDate &&
-      filters.endDate === next.endDate;
+      doneQuery.filters.status === next.status &&
+      doneQuery.filters.type === next.type &&
+      doneQuery.filters.startDate === next.startDate &&
+      doneQuery.filters.endDate === next.endDate;
 
-    if (!alreadySame) setFilters(next);
-  }, [startDate, endDate, filters, setFilters]);
+    if (!alreadySame) doneQuery.setFilters(next);
+  }, [startDate, endDate, doneQuery.filters, doneQuery.setFilters]);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Transaction | null>(null);
 
   const pending = useMemo(
     () =>
-      transactions.filter((t) => t.type === "out" && t.status === "pending"),
-    [transactions],
+      pendingQuery.transactions.filter(
+        (t) => t.type === "out" && t.status === "pending",
+      ),
+    [pendingQuery.transactions],
   );
   const done = useMemo(
-    () => transactions.filter((t) => t.type === "out" && t.status === "done"),
-    [transactions],
+    () =>
+      doneQuery.transactions.filter(
+        (t) => t.type === "out" && t.status === "done",
+      ),
+    [doneQuery.transactions],
   );
 
   const openCreate = () => {
@@ -94,11 +102,20 @@ export default function ExpensesPage() {
   const handleDelete = async (id: number) => {
     const ok = window.confirm("Delete this expense? This cannot be undone.");
     if (!ok) return;
-    await deleteTransaction(id);
+
+    try {
+      await transactionsAPI.delete(id);
+      toast.success("Expense deleted");
+      await Promise.all([pendingQuery.refetch(), doneQuery.refetch()]);
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to delete expense",
+      );
+    }
   };
 
   const handleSubmit = async (values: TransactionFormValues) => {
-    const payload = {
+    const payload: TransactionCreateInput | TransactionUpdateInput = {
       category_id: values.category_id,
       amount: values.amount,
       currency: values.currency,
@@ -112,14 +129,23 @@ export default function ExpensesPage() {
         : undefined,
     };
 
-    if (editing) {
-      await updateTransaction(editing.id, payload);
-    } else {
-      await createTransaction(payload);
-    }
+    try {
+      if (editing) {
+        await transactionsAPI.update(editing.id, payload);
+        toast.success("Expense updated");
+      } else {
+        await transactionsAPI.create(payload);
+        toast.success("Expense created");
+      }
 
-    setModalOpen(false);
-    setEditing(null);
+      await Promise.all([pendingQuery.refetch(), doneQuery.refetch()]);
+      setModalOpen(false);
+      setEditing(null);
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to save expense entry",
+      );
+    }
   };
 
   const title = editing ? "Edit Expense" : "New Expense";
@@ -158,7 +184,7 @@ export default function ExpensesPage() {
           </div>
         </div>
 
-        {categoriesLoading || txLoading ? (
+        {categoriesLoading || pendingQuery.loading || doneQuery.loading ? (
           <Loading label="Loading expenses..." />
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -167,7 +193,7 @@ export default function ExpensesPage() {
                 <div>
                   <h3 className="text-lg font-semibold">Pending</h3>
                   <p className="text-sm text-slate-500">
-                    Expenses waiting to be paid.
+                    Expenses waiting to be paid (all months).
                   </p>
                 </div>
                 <span className="text-sm font-medium text-slate-600">
@@ -177,7 +203,7 @@ export default function ExpensesPage() {
 
               {pending.length === 0 ? (
                 <div className="text-sm text-slate-500">
-                  No pending expenses for this month.
+                  No pending expenses.
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -198,7 +224,7 @@ export default function ExpensesPage() {
                 <div>
                   <h3 className="text-lg font-semibold">Done</h3>
                   <p className="text-sm text-slate-500">
-                    Expenses already paid.
+                    Expenses already paid (selected month).
                   </p>
                 </div>
                 <span className="text-sm font-medium text-slate-600">
