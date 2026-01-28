@@ -7,11 +7,11 @@ export function Navbar({ onMenuClick }: { onMenuClick: () => void }) {
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="p-2 bg-primary rounded-xl shadow-lg group-hover:scale-105 transition-transform">
+            <div className="p-2 bg-sky-500 rounded-xl shadow-lg group-hover:scale-105 transition-transform">
               <DollarSign className="text-white" size={28} />
             </div>
             <span className="text-2xl font-bold font-display tracking-tight">
-              Hadaf<span className="text-primary">.</span>
+              Hadaf<span className="text-sky-500">.</span>
             </span>
           </Link>
 

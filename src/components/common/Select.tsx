@@ -22,8 +22,8 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           className={`w-full px-4 py-2.5 rounded-lg border-2 transition-all bg-white ${
             error
               ? "border-red-500 focus:border-red-500"
-              : "border-slate-200 focus:border-primary"
-          } focus:outline-none focus:ring-4 focus:ring-primary/10 ${className}`}
+              : "border-slate-200 focus:border-sky-500"
+          } focus:outline-none focus:ring-4 focus:ring-sky-500/10 ${className}`}
           {...props}
         >
           {children}

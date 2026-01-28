@@ -22,7 +22,7 @@ export function TransactionList({
           <button
             type="button"
             onClick={onCreate}
-            className="px-4 py-2.5 rounded-lg bg-primary text-white font-medium shadow-lg hover:bg-primary/90"
+            className="px-4 py-2.5 rounded-lg bg-sky-500 text-white font-medium shadow-lg hover:bg-sky-600"
           >
             New Transaction
           </button>

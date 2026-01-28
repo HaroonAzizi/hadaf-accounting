@@ -16,18 +16,18 @@ export function TransactionRow({
   const isIncome = transaction.type === "in";
 
   return (
-    <div className="group p-4 rounded-xl border-2 border-slate-100 hover:border-primary/20 hover:shadow-md transition-all">
+    <div className="group p-4 rounded-xl border-2 border-slate-100 hover:border-sky-500/20 hover:shadow-md transition-all">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-4 min-w-0">
           <div
             className={`p-3 rounded-xl ${
-              isIncome ? "bg-income/10" : "bg-expense/10"
+              isIncome ? "bg-emerald-500/10" : "bg-red-600/10"
             }`}
           >
             {isIncome ? (
-              <ArrowUpCircle className="text-income" size={24} />
+              <ArrowUpCircle className="text-emerald-500" size={24} />
             ) : (
-              <ArrowDownCircle className="text-expense" size={24} />
+              <ArrowDownCircle className="text-red-600" size={24} />
             )}
           </div>
 
@@ -52,7 +52,7 @@ export function TransactionRow({
           <div className="text-right">
             <p
               className={`text-2xl font-bold font-display ${
-                isIncome ? "text-income" : "text-expense"
+                isIncome ? "text-emerald-500" : "text-red-600"
               }`}
             >
               {isIncome ? "+" : "-"}

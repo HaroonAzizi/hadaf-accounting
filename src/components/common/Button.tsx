@@ -28,14 +28,14 @@ export function Button({
   ...props
 }: ButtonProps) {
   const baseStyles =
-    "font-medium rounded-lg transition-all duration-200 inline-flex items-center justify-center gap-2 shadow-lg hover:shadow-xl active:scale-[0.99]";
+    "font-medium text-slate-900 rounded-lg transition-all duration-200 inline-flex items-center justify-center gap-2 shadow-lg hover:shadow-xl active:scale-[0.99]";
 
   const variants: Record<ButtonVariant, string> = {
-    primary: "bg-primary text-white hover:bg-primary/90",
-    income: "bg-income text-white hover:bg-income/90",
-    expense: "bg-expense text-white hover:bg-expense/90",
+    primary: "bg-sky-500 text-white hover:bg-sky-600",
+    income: "bg-emerald-500 text-white hover:bg-emerald-600",
+    expense: "bg-red-600 text-white hover:bg-red-700",
     outline:
-      "border-2 border-slate-200 text-slate-800 hover:border-primary hover:text-primary",
+      "border-2 border-slate-200 text-slate-800 hover:border-sky-500 hover:text-sky-600",
     ghost: "text-slate-800 hover:bg-slate-100 shadow-none",
   };
 
@@ -56,7 +56,7 @@ export function Button({
       {...props}
     >
       {loading ? (
-        <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+        <span className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
       ) : (
         <>
           {Icon ? <Icon size={18} /> : null}

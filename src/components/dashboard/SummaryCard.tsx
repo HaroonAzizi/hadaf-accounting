@@ -56,19 +56,19 @@ export function SummaryCard({
 
   const icon =
     type === "income" ? (
-      <TrendingUp className="text-income" size={32} />
+      <TrendingUp className="text-emerald-500" size={32} />
     ) : type === "expense" ? (
-      <TrendingDown className="text-expense" size={32} />
+      <TrendingDown className="text-red-600" size={32} />
     ) : (
-      <DollarSign className="text-profit" size={32} />
+      <DollarSign className="text-sky-500" size={32} />
     );
 
   const colors =
     type === "income"
-      ? "border-income/30 bg-income/5"
+      ? "border-emerald-500/30 bg-emerald-500/5"
       : type === "expense"
-        ? "border-expense/30 bg-expense/5"
-        : "border-profit/30 bg-profit/5";
+        ? "border-red-600/30 bg-red-600/5"
+        : "border-sky-500/30 bg-sky-500/5";
 
   return (
     <Card className={`p-6 border-2 ${colors}`}>

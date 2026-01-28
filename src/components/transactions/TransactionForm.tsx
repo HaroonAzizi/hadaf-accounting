@@ -82,7 +82,7 @@ export function TransactionForm({
                 {...register("type")}
                 className="peer sr-only"
               />
-              <div className="p-3 border-2 rounded-lg cursor-pointer text-center transition-all peer-checked:border-income peer-checked:bg-income/10 peer-checked:text-income font-medium">
+              <div className="p-3 border-2 rounded-lg cursor-pointer text-center transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-500/10 peer-checked:text-emerald-600 font-medium">
                 Income
               </div>
             </label>
@@ -93,7 +93,7 @@ export function TransactionForm({
                 {...register("type")}
                 className="peer sr-only"
               />
-              <div className="p-3 border-2 rounded-lg cursor-pointer text-center transition-all peer-checked:border-expense peer-checked:bg-expense/10 peer-checked:text-expense font-medium">
+              <div className="p-3 border-2 rounded-lg cursor-pointer text-center transition-all peer-checked:border-red-600 peer-checked:bg-red-600/10 peer-checked:text-red-600 font-medium">
                 Expense
               </div>
             </label>
@@ -167,7 +167,7 @@ export function TransactionForm({
           </div>
           <textarea
             rows={3}
-            className="w-full px-4 py-2.5 rounded-lg border-2 transition-all border-slate-200 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 pl-11 resize-none"
+            className="w-full px-4 py-2.5 rounded-lg border-2 transition-all border-slate-200 focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-500/10 pl-11 resize-none"
             placeholder="Additional notes..."
             {...register("description")}
           />

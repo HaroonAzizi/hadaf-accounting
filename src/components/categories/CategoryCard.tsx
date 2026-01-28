@@ -15,7 +15,7 @@ export function CategoryCard({
 }) {
   return (
     <div
-      className="group p-4 rounded-xl border-2 border-slate-100 hover:border-primary/20 hover:shadow-md transition-all"
+      className="group p-4 rounded-xl border-2 border-slate-100 hover:border-sky-500/20 hover:shadow-md transition-all"
       style={{ marginLeft: depth * 14 }}
     >
       <div className="flex items-center justify-between gap-4">
