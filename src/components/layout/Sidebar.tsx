@@ -3,6 +3,7 @@ import {
   FolderOpen,
   Receipt,
   ArrowDownCircle,
+  ArrowUpCircle,
   FileText,
   X,
 } from "lucide-react";
@@ -11,6 +12,7 @@ import { NavLink } from "react-router-dom";
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
   { icon: Receipt, label: "Transactions", path: "/transactions" },
+  { icon: ArrowUpCircle, label: "Income", path: "/income" },
   { icon: ArrowDownCircle, label: "Expenses", path: "/expenses" },
   { icon: FolderOpen, label: "Categories", path: "/categories" },
   { icon: FileText, label: "Reports", path: "/reports" },

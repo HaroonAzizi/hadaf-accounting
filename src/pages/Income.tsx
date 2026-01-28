@@ -28,7 +28,7 @@ function monthRange(month: string | null) {
   return { startDate, endDate };
 }
 
-export default function ExpensesPage() {
+export default function IncomePage() {
   const { categories, loading: categoriesLoading } = useCategories();
 
   const [month, setMonth] = useState(() =>
@@ -46,7 +46,7 @@ export default function ExpensesPage() {
     deleteTransaction,
   } = useTransactions({
     status: "all",
-    type: "out",
+    type: "in",
     startDate,
     endDate,
   });
@@ -54,7 +54,7 @@ export default function ExpensesPage() {
   useEffect(() => {
     const next = {
       status: "all" as const,
-      type: "out" as const,
+      type: "in" as const,
       startDate,
       endDate,
     };
@@ -72,12 +72,11 @@ export default function ExpensesPage() {
   const [editing, setEditing] = useState<Transaction | null>(null);
 
   const pending = useMemo(
-    () =>
-      transactions.filter((t) => t.type === "out" && t.status === "pending"),
+    () => transactions.filter((t) => t.type === "in" && t.status === "pending"),
     [transactions],
   );
   const done = useMemo(
-    () => transactions.filter((t) => t.type === "out" && t.status === "done"),
+    () => transactions.filter((t) => t.type === "in" && t.status === "done"),
     [transactions],
   );
 
@@ -92,7 +91,9 @@ export default function ExpensesPage() {
   };
 
   const handleDelete = async (id: number) => {
-    const ok = window.confirm("Delete this expense? This cannot be undone.");
+    const ok = window.confirm(
+      "Delete this income entry? This cannot be undone.",
+    );
     if (!ok) return;
     await deleteTransaction(id);
   };
@@ -102,7 +103,7 @@ export default function ExpensesPage() {
       category_id: values.category_id,
       amount: values.amount,
       currency: values.currency,
-      type: "out" as const,
+      type: "in" as const,
       status: values.status,
       date: values.date,
       name: values.name,
@@ -122,7 +123,7 @@ export default function ExpensesPage() {
     setEditing(null);
   };
 
-  const title = editing ? "Edit Expense" : "New Expense";
+  const title = editing ? "Edit Income" : "New Income";
 
   return (
     <Layout>
@@ -130,15 +131,15 @@ export default function ExpensesPage() {
         <header className="flex items-end justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold font-display tracking-tight">
-              Expenses
+              Income
             </h1>
             <p className="text-slate-600 mt-1">
-              View pending and done expenses, filtered by month.
+              View pending and done income, filtered by month.
             </p>
           </div>
 
           <Button onClick={openCreate} size="md">
-            New Expense
+            New Income
           </Button>
         </header>
 
@@ -159,7 +160,7 @@ export default function ExpensesPage() {
         </div>
 
         {categoriesLoading || txLoading ? (
-          <Loading label="Loading expenses..." />
+          <Loading label="Loading income..." />
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="p-6" overflow="visible">
@@ -167,7 +168,7 @@ export default function ExpensesPage() {
                 <div>
                   <h3 className="text-lg font-semibold">Pending</h3>
                   <p className="text-sm text-slate-500">
-                    Expenses waiting to be paid.
+                    Income waiting to be received.
                   </p>
                 </div>
                 <span className="text-sm font-medium text-slate-600">
@@ -177,7 +178,7 @@ export default function ExpensesPage() {
 
               {pending.length === 0 ? (
                 <div className="text-sm text-slate-500">
-                  No pending expenses for this month.
+                  No pending income for this month.
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -198,7 +199,7 @@ export default function ExpensesPage() {
                 <div>
                   <h3 className="text-lg font-semibold">Done</h3>
                   <p className="text-sm text-slate-500">
-                    Expenses already paid.
+                    Income already received.
                   </p>
                 </div>
                 <span className="text-sm font-medium text-slate-600">
@@ -208,7 +209,7 @@ export default function ExpensesPage() {
 
               {done.length === 0 ? (
                 <div className="text-sm text-slate-500">
-                  No paid expenses for this month.
+                  No received income for this month.
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -238,7 +239,7 @@ export default function ExpensesPage() {
           <TransactionForm
             categories={categories}
             initialData={editing}
-            lockedType="out"
+            lockedType="in"
             onSubmit={handleSubmit}
           />
         </Modal>
