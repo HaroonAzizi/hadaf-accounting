@@ -17,7 +17,7 @@ createRoot(document.getElementById("root")!).render(
           toastOptions={{
             duration: 3500,
             className:
-              "bg-white/90 dark:bg-slate-950/80 text-slate-900 dark:text-slate-100 border border-slate-200/70 dark:border-slate-800/70 backdrop-blur",
+              "bg-white/90 text-slate-900 border border-slate-200/70 backdrop-blur",
           }}
         />
       </AppProvider>

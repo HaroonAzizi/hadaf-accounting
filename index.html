@@ -4,21 +4,6 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script>
-      (function () {
-        try {
-          var stored = localStorage.getItem("theme");
-          var theme = stored === "dark" ? "dark" : "light";
-
-          var root = document.documentElement;
-          var isDark = theme === "dark";
-          root.classList.toggle("dark", isDark);
-          if (document.body) document.body.classList.toggle("dark", isDark);
-        } catch (e) {
-          // ignore
-        }
-      })();
-    </script>
     <title>hadaf-accounting</title>
   </head>
   <body>

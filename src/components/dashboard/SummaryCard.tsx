@@ -65,20 +65,20 @@ export function SummaryCard({
 
   const colors =
     type === "income"
-      ? "border-emerald-500/30 bg-emerald-500/5 dark:bg-emerald-500/10"
+      ? "border-emerald-500/30 bg-emerald-500/5"
       : type === "expense"
-        ? "border-red-600/30 bg-red-600/5 dark:bg-red-600/10"
-        : "border-sky-500/30 bg-sky-500/5 dark:bg-sky-500/10";
+        ? "border-red-600/30 bg-red-600/5"
+        : "border-sky-500/30 bg-sky-500/5";
 
   return (
     <Card className={`p-6 border-2 ${colors}`}>
       <div className="flex items-start justify-between mb-4">
         <div>
-          <p className="text-sm font-medium text-slate-600 dark:text-slate-300 uppercase tracking-wide">
+          <p className="text-sm font-medium text-slate-600 uppercase tracking-wide">
             {title}
           </p>
         </div>
-        <div className="p-3 rounded-xl bg-white/80 dark:bg-slate-950/40 border border-slate-200/70 dark:border-slate-800/70 shadow-sm">
+        <div className="p-3 rounded-xl bg-white/80 border border-slate-200/70 shadow-sm">
           {icon}
         </div>
       </div>

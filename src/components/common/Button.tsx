@@ -35,9 +35,8 @@ export function Button({
     income: "bg-emerald-500 text-white hover:bg-emerald-600",
     expense: "bg-red-600 text-white hover:bg-red-700",
     outline:
-      "border-2 border-slate-200/80 dark:border-slate-800 text-slate-800 dark:text-slate-100 bg-white/40 dark:bg-slate-950/20 hover:border-sky-500 hover:text-sky-600 dark:hover:text-sky-300",
-    ghost:
-      "text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-900/70 shadow-none",
+      "border-2 border-slate-200/80 text-slate-800 bg-white/40 hover:border-sky-500 hover:text-sky-600",
+    ghost: "text-slate-800 hover:bg-slate-100 shadow-none",
   };
 
   const sizes: Record<ButtonSize, string> = {

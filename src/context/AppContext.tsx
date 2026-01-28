@@ -1,7 +1,7 @@
+/* eslint-disable react-refresh/only-export-components */
 import {
   createContext,
   useContext,
-  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -17,24 +17,9 @@ export type AppContextValue = {
   setDateRange: (next: DateRange) => void;
   selectedCategory: number | null;
   setSelectedCategory: (id: number | null) => void;
-  theme: "light" | "dark";
-  setTheme: (next: "light" | "dark") => void;
-  toggleTheme: () => void;
 };
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
-
-function getInitialTheme(): "light" | "dark" {
-  try {
-    const stored = localStorage.getItem("theme");
-    if (stored === "light" || stored === "dark") return stored;
-  } catch {
-    // ignore
-  }
-
-  // Manual-only default: if the user hasn't chosen, start in light mode.
-  return "light";
-}
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [dateRange, setDateRange] = useState<DateRange>({
@@ -42,18 +27,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     endDate: null,
   });
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const [theme, setTheme] = useState<"light" | "dark">(() => getInitialTheme());
-
-  useEffect(() => {
-    const root = document.documentElement;
-    root.classList.toggle("dark", theme === "dark");
-    document.body?.classList.toggle("dark", theme === "dark");
-    try {
-      localStorage.setItem("theme", theme);
-    } catch {
-      // ignore
-    }
-  }, [theme]);
 
   const value = useMemo<AppContextValue>(
     () => ({
@@ -61,11 +34,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setDateRange,
       selectedCategory,
       setSelectedCategory,
-      theme,
-      setTheme,
-      toggleTheme: () => setTheme((t) => (t === "dark" ? "light" : "dark")),
     }),
-    [dateRange, selectedCategory, theme],
+    [dateRange, selectedCategory],
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
