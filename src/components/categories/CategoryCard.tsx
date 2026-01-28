@@ -26,7 +26,7 @@ export function CategoryCard({
           </p>
         </div>
 
-        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+        <div className="flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity shrink-0">
           <button
             onClick={() => onEdit(category)}
             className="p-2 hover:bg-blue-50 rounded-lg transition-colors"

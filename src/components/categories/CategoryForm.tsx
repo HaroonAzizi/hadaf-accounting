@@ -9,16 +9,29 @@ import { Button } from "../common/Button";
 import { Input } from "../common/Input";
 import { Select } from "../common/Select";
 
+function normalizeDefaultParentId(value: unknown): "" | number {
+  if (value === "" || value === null || value === undefined) return "";
+  const n = typeof value === "number" ? value : Number(value);
+  if (!Number.isFinite(n) || n <= 0) return "";
+  return n;
+}
+
 const schema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
   parentId: z
-    .union([z.coerce.number().int().positive(), z.literal("")])
-    .optional()
-    .transform((v) => (v === "" || v === undefined ? null : Number(v))),
+    .union([z.string(), z.number(), z.null(), z.undefined()])
+    .transform((value) => {
+      if (value === "" || value === null || value === undefined) return null;
+      const n = typeof value === "number" ? value : Number(value);
+      if (!Number.isFinite(n) || n <= 0) return null;
+      return n;
+    })
+    .pipe(z.number().int().positive().nullable()),
   type: z.string().optional(),
 });
 
-export type CategoryFormValues = z.input<typeof schema>;
+export type CategoryFormInput = z.input<typeof schema>;
+export type CategoryFormValues = z.output<typeof schema>;
 
 export function CategoryForm({
   categories,
@@ -39,25 +52,24 @@ export function CategoryForm({
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<CategoryFormValues>({
+  } = useForm<CategoryFormInput, unknown, CategoryFormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       name: initial?.name ?? "",
-      parentId: initial?.parent_id ?? "",
+      parentId: normalizeDefaultParentId(initial?.parent_id),
       type: initial?.type ?? "",
     },
   });
 
   return (
     <form
-      onSubmit={handleSubmit((v) => {
-        const parsed = schema.parse(v);
-        return onSubmit({
-          name: parsed.name,
-          parentId: parsed.parentId,
-          type: parsed.type || undefined,
-        });
-      })}
+      onSubmit={handleSubmit((v) =>
+        onSubmit({
+          name: v.name,
+          parentId: v.parentId,
+          type: v.type || undefined,
+        }),
+      )}
       className="space-y-5"
     >
       <Input
