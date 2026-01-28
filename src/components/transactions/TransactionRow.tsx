@@ -46,8 +46,11 @@ export function TransactionRow({
           </div>
 
           <div className="min-w-0">
-            <div className="flex items-center gap-2 min-w-0">
-              <h4 className="font-semibold text-lg truncate">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 min-w-0">
+              <h4
+                className="font-semibold text-lg whitespace-normal break-words leading-snug"
+                title={transaction.name}
+              >
                 {transaction.name}
               </h4>
               <span
