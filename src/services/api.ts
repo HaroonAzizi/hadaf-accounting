@@ -18,7 +18,10 @@ export type ApiError = {
 export type ApiResponse<T> = ApiSuccess<T> | ApiError;
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api",
+  baseURL:
+    import.meta.env.VITE_API_BASE_URL ||
+    import.meta.env.VITE_API_URL ||
+    "http://localhost:5000/api",
   headers: { "Content-Type": "application/json" },
 });
 
@@ -94,13 +97,19 @@ export type DashboardSummary = {
 };
 
 export const categoriesAPI = {
-  getAll: () => api.get<ApiSuccess<Category[]>>("/categories"),
-  getById: (id: number) => api.get<ApiSuccess<Category>>(`/categories/${id}`),
+  getAll: () =>
+    api.get<ApiSuccess<Category[]>, ApiSuccess<Category[]>>("/categories"),
+  getById: (id: number) =>
+    api.get<ApiSuccess<Category>, ApiSuccess<Category>>(`/categories/${id}`),
   create: (data: { name: string; parentId?: number | null; type?: string }) =>
-    api.post<ApiSuccess<Category>>("/categories", data),
+    api.post<ApiSuccess<Category>, ApiSuccess<Category>>("/categories", data),
   update: (id: number, data: { name?: string; parentId?: number | null }) =>
-    api.put<ApiSuccess<Category>>(`/categories/${id}`, data),
-  delete: (id: number) => api.delete<ApiSuccess<boolean>>(`/categories/${id}`),
+    api.put<ApiSuccess<Category>, ApiSuccess<Category>>(
+      `/categories/${id}`,
+      data,
+    ),
+  delete: (id: number) =>
+    api.delete<ApiSuccess<boolean>, ApiSuccess<boolean>>(`/categories/${id}`),
 };
 
 export const transactionsAPI = {
@@ -110,33 +119,58 @@ export const transactionsAPI = {
     startDate?: string;
     endDate?: string;
     currency?: string;
-  }) => api.get<ApiSuccess<Transaction[]>>("/transactions", { params }),
+  }) =>
+    api.get<ApiSuccess<Transaction[]>, ApiSuccess<Transaction[]>>(
+      "/transactions",
+      { params },
+    ),
   getById: (id: number) =>
-    api.get<ApiSuccess<Transaction>>(`/transactions/${id}`),
+    api.get<ApiSuccess<Transaction>, ApiSuccess<Transaction>>(
+      `/transactions/${id}`,
+    ),
   create: (
     data: Omit<
       Transaction,
       "id" | "category_name" | "created_at" | "updated_at"
     >,
-  ) => api.post<ApiSuccess<Transaction>>("/transactions", data),
+  ) =>
+    api.post<ApiSuccess<Transaction>, ApiSuccess<Transaction>>(
+      "/transactions",
+      data,
+    ),
   update: (
     id: number,
     data: Partial<
       Omit<Transaction, "id" | "category_name" | "created_at" | "updated_at">
     >,
-  ) => api.put<ApiSuccess<Transaction>>(`/transactions/${id}`, data),
+  ) =>
+    api.put<ApiSuccess<Transaction>, ApiSuccess<Transaction>>(
+      `/transactions/${id}`,
+      data,
+    ),
   delete: (id: number) =>
-    api.delete<ApiSuccess<boolean>>(`/transactions/${id}`),
+    api.delete<ApiSuccess<boolean>, ApiSuccess<boolean>>(`/transactions/${id}`),
 };
 
 export const dashboardAPI = {
   getSummary: (params?: { startDate?: string; endDate?: string }) =>
-    api.get<ApiSuccess<DashboardSummary>>("/dashboard/summary", { params }),
+    api.get<ApiSuccess<DashboardSummary>, ApiSuccess<DashboardSummary>>(
+      "/dashboard/summary",
+      { params },
+    ),
 };
 
 export const recurringAPI = {
-  getAll: () => api.get<ApiSuccess<RecurringTransaction[]>>("/recurring"),
-  getDue: () => api.get<ApiSuccess<RecurringTransaction[]>>("/recurring/due"),
+  getAll: () =>
+    api.get<
+      ApiSuccess<RecurringTransaction[]>,
+      ApiSuccess<RecurringTransaction[]>
+    >("/recurring"),
+  getDue: () =>
+    api.get<
+      ApiSuccess<RecurringTransaction[]>,
+      ApiSuccess<RecurringTransaction[]>
+    >("/recurring/due"),
   create: (data: {
     category_id: number;
     amount: number;
@@ -147,7 +181,11 @@ export const recurringAPI = {
     frequency: Frequency;
     next_due_date: string;
     is_active?: boolean;
-  }) => api.post<ApiSuccess<RecurringTransaction>>("/recurring", data),
+  }) =>
+    api.post<
+      ApiSuccess<RecurringTransaction>,
+      ApiSuccess<RecurringTransaction>
+    >("/recurring", data),
   update: (
     id: number,
     data: Partial<{
@@ -161,10 +199,16 @@ export const recurringAPI = {
       next_due_date: string;
       is_active: boolean;
     }>,
-  ) => api.put<ApiSuccess<RecurringTransaction>>(`/recurring/${id}`, data),
-  delete: (id: number) => api.delete<ApiSuccess<boolean>>(`/recurring/${id}`),
+  ) =>
+    api.put<ApiSuccess<RecurringTransaction>, ApiSuccess<RecurringTransaction>>(
+      `/recurring/${id}`,
+      data,
+    ),
+  delete: (id: number) =>
+    api.delete<ApiSuccess<boolean>, ApiSuccess<boolean>>(`/recurring/${id}`),
   execute: (id: number) =>
     api.post<
+      ApiSuccess<{ transaction: Transaction; recurring: RecurringTransaction }>,
       ApiSuccess<{ transaction: Transaction; recurring: RecurringTransaction }>
     >(`/recurring/${id}/execute`, {}),
 };
@@ -176,6 +220,10 @@ export const exportAPI = {
     startDate?: string;
     endDate?: string;
     currency?: string;
-  }) => api.get("/export/csv", { params, responseType: "blob" }),
-  backup: () => api.get("/export/backup", { responseType: "blob" }),
+  }) =>
+    api.get<Blob, Blob>("/export/csv", {
+      params,
+      responseType: "blob",
+    }),
+  backup: () => api.get<Blob, Blob>("/export/backup", { responseType: "blob" }),
 };
