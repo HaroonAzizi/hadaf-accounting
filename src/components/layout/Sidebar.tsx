@@ -2,6 +2,7 @@ import {
   LayoutDashboard,
   FolderOpen,
   Receipt,
+  ArrowDownCircle,
   FileText,
   X,
 } from "lucide-react";
@@ -10,6 +11,7 @@ import { NavLink } from "react-router-dom";
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
   { icon: Receipt, label: "Transactions", path: "/transactions" },
+  { icon: ArrowDownCircle, label: "Expenses", path: "/expenses" },
   { icon: FolderOpen, label: "Categories", path: "/categories" },
   { icon: FileText, label: "Reports", path: "/reports" },
 ] as const;

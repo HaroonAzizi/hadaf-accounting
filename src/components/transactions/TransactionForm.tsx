@@ -51,16 +51,18 @@ export type TransactionFormValues = z.infer<typeof schema>;
 export function TransactionForm({
   categories,
   initialData,
+  lockedType,
   onSubmit,
 }: {
   categories: Category[];
   initialData?: Transaction | null;
+  lockedType?: TransactionType;
   onSubmit: (data: TransactionFormValues) => Promise<void> | void;
 }) {
   const flat = useMemo(() => flattenCategories(categories), [categories]);
 
   const defaultValues: TransactionFormInput = {
-    type: (initialData?.type ?? "in") as TransactionType,
+    type: (lockedType ?? initialData?.type ?? "in") as TransactionType,
     status: (initialData?.status ?? "done") as TransactionStatus,
     category_id: initialData?.category_id ?? "",
     amount: initialData?.amount ?? "",
@@ -93,38 +95,56 @@ export function TransactionForm({
       className="space-y-5"
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="text-sm font-medium text-slate-700 mb-2 block">
-            Type
-          </label>
-          <div className="grid grid-cols-2 gap-2">
-            <label className="relative">
-              <input
-                type="radio"
-                value="in"
-                {...register("type")}
-                className="peer sr-only"
-              />
-              <div className="p-3 border-2 rounded-lg cursor-pointer text-center transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-500/10 peer-checked:text-emerald-600 font-medium">
-                Income
-              </div>
+        {lockedType ? (
+          <div>
+            <label className="text-sm font-medium text-slate-700 mb-2 block">
+              Type
             </label>
-            <label className="relative">
-              <input
-                type="radio"
-                value="out"
-                {...register("type")}
-                className="peer sr-only"
-              />
-              <div className="p-3 border-2 rounded-lg cursor-pointer text-center transition-all peer-checked:border-red-600 peer-checked:bg-red-600/10 peer-checked:text-red-600 font-medium">
-                Expense
-              </div>
-            </label>
+            <div
+              className={`p-3 border-2 rounded-lg text-center font-medium ${
+                lockedType === "in"
+                  ? "border-emerald-500 bg-emerald-500/10 text-emerald-600"
+                  : "border-red-600 bg-red-600/10 text-red-600"
+              }`}
+            >
+              {lockedType === "in" ? "Income" : "Expense"}
+            </div>
+            <input type="hidden" value={lockedType} {...register("type")} />
           </div>
-          {errors.type ? (
-            <p className="text-sm text-red-500 mt-1">{errors.type.message}</p>
-          ) : null}
-        </div>
+        ) : (
+          <div>
+            <label className="text-sm font-medium text-slate-700 mb-2 block">
+              Type
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <label className="relative">
+                <input
+                  type="radio"
+                  value="in"
+                  {...register("type")}
+                  className="peer sr-only"
+                />
+                <div className="p-3 border-2 rounded-lg cursor-pointer text-center transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-500/10 peer-checked:text-emerald-600 font-medium">
+                  Income
+                </div>
+              </label>
+              <label className="relative">
+                <input
+                  type="radio"
+                  value="out"
+                  {...register("type")}
+                  className="peer sr-only"
+                />
+                <div className="p-3 border-2 rounded-lg cursor-pointer text-center transition-all peer-checked:border-red-600 peer-checked:bg-red-600/10 peer-checked:text-red-600 font-medium">
+                  Expense
+                </div>
+              </label>
+            </div>
+            {errors.type ? (
+              <p className="text-sm text-red-500 mt-1">{errors.type.message}</p>
+            ) : null}
+          </div>
+        )}
 
         <Select
           label="Status"
